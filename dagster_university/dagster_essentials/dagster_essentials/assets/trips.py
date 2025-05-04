@@ -51,15 +51,15 @@ def taxi_trips() -> None:
         );
     """
 
-    conn = backoff(
+    with backoff(
         fn=duckdb.connect,
         retry_on=(RuntimeError, duckdb.IOException),
         kwargs={
             "database": os.getenv("DUCKDB_DATABASE")
         },
         max_retries=10
-    )
-    conn.execute(query)
+    ) as conn:
+        conn.execute(query)
 
 @dg.asset(
     deps=["taxi_zones_file"]
@@ -81,12 +81,12 @@ def taxi_zones() -> None:
         );
     """
 
-    conn = backoff(
+    with backoff(
         fn=duckdb.connect,
         retry_on=(RuntimeError, duckdb.IOException),
         kwargs={
             "database": os.getenv("DUCKDB_DATABASE")
         },
         max_retries=10
-    )
-    conn.execute(query)
+    ) as conn:
+        conn.execute(query)
